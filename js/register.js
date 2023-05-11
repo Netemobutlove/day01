@@ -2,17 +2,20 @@
 // import { axios } from 'axios';
 document.querySelector('.rounded-pill').addEventListener('click', async function () {
   const form = document.querySelector('.register-form');
-  const data = serialize(form, { hash: true, empty: true });
-  //   console.log(data);
-  const taost = new bootstrap.Toast(document.querySelector('.my-toast'));
+  const { username, password } = serialize(form, { hash: true, empty: true });
   try {
-    const res = await axios.post('/registedr', data);
-    console.log(res);
-    taost.show();
-    document.querySelector('.toast-body').innerHTML = res.data.message;
+    if (!/^\w{8,30}$/.test(username)) {
+      return showTost('用户名不能少于8位');
+    }
+    if (!/^\w{6,30}$/.test(password)) {
+      return showTost('密码不能少于6位');
+    }
+    const res = await axios.post('/register', { username, password });
+    showTost(res.data.message);
+    setTimeout(()=>{
+      location.href='./login.html'
+    },1500)
   } catch (err) {
-    // document.querySelector('.my-toast').classList.add('show');
-    console.log(err);
-    // // document.querySelector('.toast-body').innerHTML = err.data.message;
+    showTost(err.response.data.message);
   }
 });
